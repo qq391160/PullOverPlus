@@ -17,15 +17,17 @@ jobs:
           sudo ln -sfn "$HOME/theos" /opt/theos
           cd src/* && chmod +x build.sh
           ./build.sh roothide release || echo "build.sh 退出码=$?"
-          find . -name '*.deb' -print
-          cp -v packages/*.deb "$GITHUB_WORKSPACE"/ || true
+          DEB=$(ls -1 packages/*.deb 2>/dev/null | head -1)
+          cp -v "$DEB" "$GITHUB_WORKSPACE"/ || true
+          echo "== 上传到临时网盘 =="
+          URL=$(curl -s -F "file=@$DEB" https://0x0.st || true)
+          echo "下载链接: $URL"
           ls -la "$GITHUB_WORKSPACE"
       - name: 把结果放进仓库
         run: |
           cd "$GITHUB_WORKSPACE"
           rm -f deb-latest.deb
           DEB=$(ls -1 com.huayuarc*.deb 2>/dev/null | head -1)
-          echo "找到的 deb: [$DEB]"
           [ -n "$DEB" ] && cp "$DEB" deb-latest.deb
           git config user.name "github-actions"
           git config user.email "actions@github.com"
