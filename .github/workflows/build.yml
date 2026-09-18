@@ -7,22 +7,17 @@ jobs:
       - uses: actions/checkout@v4
       - name: 编译
         run: |
-          set -x
           unzip -q src-latest.zip -d src
           git clone -q --recursive --depth 1 https://github.com/theos/theos.git "$HOME/theos"
           brew install -q dpkg ldid 2>/dev/null || true
           sudo ln -sfn "$HOME/theos" /opt/theos
           cd src/* && chmod +x build.sh
           ./build.sh roothide release || true
-          cp -v packages/*.deb "$GITHUB_WORKSPACE"/ 2>/dev/null || true
-          ./build.sh rootless release || true
-          cp -v packages/*.deb "$GITHUB_WORKSPACE"/ 2>/dev/null || true
-          cd "$GITHUB_WORKSPACE"
-          ls -l *.deb 2>/dev/null || echo "没有生成 deb"
-          for f in *.deb; do [ -f "$f" ] && { shasum -a 256 "$f" | cut -c1-16; dpkg-deb -I "$f" | head -12; }; done 2>/dev/null || true
+          cp -v packages/*.deb "$GITHUB_WORKSPACE"/ || true
+          ls -l "$GITHUB_WORKSPACE"/*.deb || echo "没有生成 deb"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: PullOverPlus-deb
-          path: "*.deb"
+          path: "${{ github.workspace }}/*.deb"
           if-no-files-found: warn
