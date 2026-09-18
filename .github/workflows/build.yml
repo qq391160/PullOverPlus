@@ -1,5 +1,7 @@
 name: build
 on: [push, workflow_dispatch]
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: macos-14
@@ -13,11 +15,18 @@ jobs:
           sudo ln -sfn "$HOME/theos" /opt/theos
           cd src/* && chmod +x build.sh
           ./build.sh roothide release || true
+          echo "--- deb 在哪 ---"
+          find . -name '*.deb'
           cp -v packages/*.deb "$GITHUB_WORKSPACE"/ || true
           ls -l "$GITHUB_WORKSPACE"/*.deb || echo "没有生成 deb"
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: PullOverPlus-deb
-          path: "${{ github.workspace }}/*.deb"
-          if-no-files-found: warn
+      - name: 把 deb 放进仓库
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          DEB=$(ls -1 *.deb 2>/dev/null | head -1)
+          if [ -z "$DEB" ]; then echo "没有 deb，跳过"; exit 0; fi
+          cp "$DEB" deb-latest.deb
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -f deb-latest.deb
+          git commit -m "add deb-latest.deb" || true
+          git push || true
