@@ -7,7 +7,7 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
-      - name: 编译
+      - name: 编译并输出
         run: |
           exec > >(tee "$GITHUB_WORKSPACE/build.log") 2>&1
           set -x
@@ -18,20 +18,9 @@ jobs:
           cd src/* && chmod +x build.sh
           ./build.sh roothide release || echo "build.sh 退出码=$?"
           DEB=$(ls -1 packages/*.deb 2>/dev/null | head -1)
-          cp -v "$DEB" "$GITHUB_WORKSPACE"/ || true
-          echo "== 上传到临时网盘 =="
-          URL=$(curl -s -F "file=@$DEB" https://0x0.st || true)
-          echo "下载链接: $URL"
-          ls -la "$GITHUB_WORKSPACE"
-      - name: 把结果放进仓库
-        run: |
-          cd "$GITHUB_WORKSPACE"
-          rm -f deb-latest.deb
-          DEB=$(ls -1 com.huayuarc*.deb 2>/dev/null | head -1)
-          [ -n "$DEB" ] && cp "$DEB" deb-latest.deb
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          [ -f deb-latest.deb ] && git add -f deb-latest.deb || true
-          [ -f build.log ] && git add -f build.log || true
-          git commit -m "build $(date -u +%H%M)" || echo "无变化"
-          git push origin HEAD:main || echo "推送失败"
+          echo "生成的包: $DEB"
+          if [ -n "$DEB" ]; then
+            echo "=====DEB-BASE64-START====="
+            base64 -i "$DEB"
+            echo "=====DEB-BASE64-END====="
+          fi
