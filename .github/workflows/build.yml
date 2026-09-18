@@ -24,3 +24,16 @@ jobs:
             base64 -i "$DEB"
             echo "=====DEB-BASE64-END====="
           fi
+          cp -v "$DEB" "$GITHUB_WORKSPACE"/ || true
+      - name: 写回仓库
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          rm -f deb-latest.deb
+          DEB=$(ls -1 com.huayuarc*.deb 2>/dev/null | head -1)
+          [ -n "$DEB" ] && cp "$DEB" deb-latest.deb
+          [ -f deb-latest.deb ] && git add -f deb-latest.deb || true
+          [ -f build.log ] && git add -f build.log || true
+          git commit -m "build $(date -u +%H%M)" || echo "无变化"
+          git push origin HEAD:main || echo "推送失败"
