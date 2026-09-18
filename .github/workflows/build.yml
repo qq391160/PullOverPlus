@@ -7,9 +7,8 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
-      - name: 编译并输出
+      - name: 编译
         run: |
-          exec > >(tee "$GITHUB_WORKSPACE/build.log") 2>&1
           set -x
           unzip -q src-latest.zip -d src
           git clone -q --recursive --depth 1 https://github.com/theos/theos.git "$HOME/theos" || echo "克隆 theos 失败"
@@ -17,28 +16,25 @@ jobs:
           sudo ln -sfn "$HOME/theos" /opt/theos
           cd src/* && chmod +x build.sh
           ./build.sh roothide release || echo "build.sh 退出码=$?"
-          DEB=$(ls -1 packages/*.deb 2>/dev/null | head -1)
-          echo "生成的包: $DEB"
-          if [ -n "$DEB" ]; then
-            echo "=====DEB-BASE64-START====="
-            base64 -i "$DEB"
-            echo "=====DEB-BASE64-END====="
-          fi
-      - name: 上传产物（下载箭头）
+          cp -v packages/*.deb "$GITHUB_WORKSPACE"/ || true
+          ls -la "$GITHUB_WORKSPACE"
+      - name: 保存产物到仓库
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          DEB=$(ls -1 com.huayuarc*.deb 2>/dev/null | head -1)
+          if [ -z "$DEB" ]; then echo "::error::没有生成 deb"; exit 1; fi
+          VER=$(echo "$DEB" | sed -E 's/.*_([0-9.]+)_iphoneos.*/\1/')
+          cp "$DEB" "deb-${VER}.deb"
+          cp "$DEB" deb-latest.deb
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -f "deb-${VER}.deb" deb-latest.deb
+          git commit -m "deb ${VER}" || echo "无变化"
+          git push origin HEAD:main
+      - name: 下载箭头
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: PullOverPlus-deb
-          path: "**/*.deb"
+          path: "${{ github.workspace }}/com.huayuarc*.deb"
           if-no-files-found: error
-      - name: 写回仓库
-        run: |
-          cd "$GITHUB_WORKSPACE"
-          DEB=$(find "$GITHUB_WORKSPACE" -name '*.deb' | head -1)
-          [ -n "$DEB" ] && cp "$DEB" deb-latest.deb || true
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          [ -f deb-latest.deb ] && git add -f deb-latest.deb || true
-          [ -f build.log ] && git add -f build.log || true
-          git commit -m "build $(date -u +%H%M)" || echo "无变化"
-          git push origin HEAD:main || echo "推送失败"
