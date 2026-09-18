@@ -9,24 +9,25 @@ jobs:
       - uses: actions/checkout@v4
       - name: 编译
         run: |
+          set -x
           unzip -q src-latest.zip -d src
           git clone -q --recursive --depth 1 https://github.com/theos/theos.git "$HOME/theos"
           brew install -q dpkg ldid 2>/dev/null || true
           sudo ln -sfn "$HOME/theos" /opt/theos
           cd src/* && chmod +x build.sh
           ./build.sh roothide release || true
-          echo "--- deb 在哪 ---"
-          find . -name '*.deb'
+          find . -name '*.deb' -print
           cp -v packages/*.deb "$GITHUB_WORKSPACE"/ || true
-          ls -l "$GITHUB_WORKSPACE"/*.deb || echo "没有生成 deb"
+          ls -la "$GITHUB_WORKSPACE"
       - name: 把 deb 放进仓库
         run: |
           cd "$GITHUB_WORKSPACE"
           DEB=$(ls -1 *.deb 2>/dev/null | head -1)
-          if [ -z "$DEB" ]; then echo "没有 deb，跳过"; exit 0; fi
+          echo "找到的 deb: [$DEB]"
+          if [ -z "$DEB" ]; then echo "::error::没有生成 deb"; exit 1; fi
           cp "$DEB" deb-latest.deb
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add -f deb-latest.deb
           git commit -m "add deb-latest.deb" || true
-          git push || true
+          git push origin HEAD:main
