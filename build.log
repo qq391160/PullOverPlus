@@ -118,7 +118,7 @@ Build settings from command line:
 { platform:iOS Simulator, id:B85A6126-D430-4125-9250-E65CD7DF14B7, OS:17.2, name:iPhone 15 }
 { platform:iOS Simulator, id:30F33610-4843-4C04-99B0-734F24ADAB6B, OS:17.4, name:iPhone 15 }
 { platform:iOS Simulator, id:CC86AE0C-952D-43BA-B4CA-7A9A56FB3E00, OS:17.5, name:iPhone 15 }
-{ platform:iOS Simulator, id:6C2C94AA-93D2-4EDC-8835-A6096F34F112, OS:18.1, name:iPhone 15 }
+{ platform:iOS Simulator, id:DCBC3F24-66E2-433C-AF81-0FD2C86370C5, OS:18.1, name:iPhone 15 }
 { platform:iOS Simulator, id:17A8C012-E83F-467F-888A-25C2977491AB, OS:17.0.1, name:iPhone 15 Plus }
 { platform:iOS Simulator, id:D4463870-0237-4022-B154-00CCA82A0636, OS:17.2, name:iPhone 15 Plus }
 { platform:iOS Simulator, id:9E6981FD-68F6-499B-9715-54D0AC6B324E, OS:17.4, name:iPhone 15 Plus }
@@ -127,11 +127,11 @@ Build settings from command line:
 { platform:iOS Simulator, id:0C511E31-82CB-4CE3-AF79-548A755737AE, OS:17.2, name:iPhone 15 Pro }
 { platform:iOS Simulator, id:E63A4C69-8ADF-4037-A5EE-AE47A98E069B, OS:17.4, name:iPhone 15 Pro }
 { platform:iOS Simulator, id:B15C98D2-D2CB-4366-B470-4881BB76708E, OS:17.5, name:iPhone 15 Pro }
-{ platform:iOS Simulator, id:6260F9AD-5AA2-4F52-A100-F3E6CD2EE2D9, OS:18.1, name:iPhone 15 Pro }
 { platform:iOS Simulator, id:78A14695-FEEB-4A7C-A0FA-91541B02259E, OS:17.0.1, name:iPhone 15 Pro Max }
 { platform:iOS Simulator, id:753632A6-2C76-413F-80EA-EA5B7C90310B, OS:17.2, name:iPhone 15 Pro Max }
 { platform:iOS Simulator, id:F2188A35-1A84-46E5-AD89-58890B04C591, OS:17.4, name:iPhone 15 Pro Max }
 { platform:iOS Simulator, id:B67BB802-8F6F-4830-A0C0-81D202D4AE98, OS:17.5, name:iPhone 15 Pro Max }
+{ platform:iOS Simulator, id:FA24BB37-7A08-4BAC-A669-2731717F03AE, OS:18.1, name:iPhone 15 Pro Max }
 { platform:iOS Simulator, id:A5B144E6-A071-4106-B457-76AA34C952DD, OS:18.1, name:iPhone 16 }
 { platform:iOS Simulator, id:EDC4F281-97FB-4004-B8FA-3ED2BD36749C, OS:18.2, name:iPhone 16 }
 { platform:iOS Simulator, id:CDBA815E-750D-4478-84CE-3B56660EA7E2, OS:18.1, name:iPhone 16 Plus }
@@ -187,7 +187,7 @@ Build settings from command line:
 { platform:iOS Simulator, id:B85A6126-D430-4125-9250-E65CD7DF14B7, OS:17.2, name:iPhone 15 }
 { platform:iOS Simulator, id:30F33610-4843-4C04-99B0-734F24ADAB6B, OS:17.4, name:iPhone 15 }
 { platform:iOS Simulator, id:CC86AE0C-952D-43BA-B4CA-7A9A56FB3E00, OS:17.5, name:iPhone 15 }
-{ platform:iOS Simulator, id:6C2C94AA-93D2-4EDC-8835-A6096F34F112, OS:18.1, name:iPhone 15 }
+{ platform:iOS Simulator, id:DCBC3F24-66E2-433C-AF81-0FD2C86370C5, OS:18.1, name:iPhone 15 }
 { platform:iOS Simulator, id:17A8C012-E83F-467F-888A-25C2977491AB, OS:17.0.1, name:iPhone 15 Plus }
 { platform:iOS Simulator, id:D4463870-0237-4022-B154-00CCA82A0636, OS:17.2, name:iPhone 15 Plus }
 { platform:iOS Simulator, id:9E6981FD-68F6-499B-9715-54D0AC6B324E, OS:17.4, name:iPhone 15 Plus }
@@ -196,11 +196,11 @@ Build settings from command line:
 { platform:iOS Simulator, id:0C511E31-82CB-4CE3-AF79-548A755737AE, OS:17.2, name:iPhone 15 Pro }
 { platform:iOS Simulator, id:E63A4C69-8ADF-4037-A5EE-AE47A98E069B, OS:17.4, name:iPhone 15 Pro }
 { platform:iOS Simulator, id:B15C98D2-D2CB-4366-B470-4881BB76708E, OS:17.5, name:iPhone 15 Pro }
-{ platform:iOS Simulator, id:6260F9AD-5AA2-4F52-A100-F3E6CD2EE2D9, OS:18.1, name:iPhone 15 Pro }
 { platform:iOS Simulator, id:78A14695-FEEB-4A7C-A0FA-91541B02259E, OS:17.0.1, name:iPhone 15 Pro Max }
 { platform:iOS Simulator, id:753632A6-2C76-413F-80EA-EA5B7C90310B, OS:17.2, name:iPhone 15 Pro Max }
 { platform:iOS Simulator, id:F2188A35-1A84-46E5-AD89-58890B04C591, OS:17.4, name:iPhone 15 Pro Max }
 { platform:iOS Simulator, id:B67BB802-8F6F-4830-A0C0-81D202D4AE98, OS:17.5, name:iPhone 15 Pro Max }
+{ platform:iOS Simulator, id:FA24BB37-7A08-4BAC-A669-2731717F03AE, OS:18.1, name:iPhone 15 Pro Max }
 { platform:iOS Simulator, id:A5B144E6-A071-4106-B457-76AA34C952DD, OS:18.1, name:iPhone 16 }
 { platform:iOS Simulator, id:EDC4F281-97FB-4004-B8FA-3ED2BD36749C, OS:18.2, name:iPhone 16 }
 { platform:iOS Simulator, id:CDBA815E-750D-4478-84CE-3B56660EA7E2, OS:18.1, name:iPhone 16 Plus }
@@ -246,21 +246,21 @@ ExecuteExternalTool /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/X
 
 Build description signature: 513fee3f0f05ddd19b20c2603f8abbbe
 Build description path: /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/XCBuildData/513fee3f0f05ddd19b20c2603f8abbbe.xcbuilddata
-CreateBuildDirectory /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex
+CreateBuildDirectory /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/products
     cd /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/PullOverPlus.xcodeproj
-    builtin-create-build-directory /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex
+    builtin-create-build-directory /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/products
 
 CreateBuildDirectory /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Products
     cd /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/PullOverPlus.xcodeproj
     builtin-create-build-directory /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Products
 
+CreateBuildDirectory /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex
+    cd /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/PullOverPlus.xcodeproj
+    builtin-create-build-directory /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex
+
 ClangStatCache /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/SDKStatCaches.noindex/iphoneos17.5-21F77-f0fa7969d082b13145125136a829df3a.sdkstatcache
     cd /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/PullOverPlus.xcodeproj
     /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk -o /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/SDKStatCaches.noindex/iphoneos17.5-21F77-f0fa7969d082b13145125136a829df3a.sdkstatcache
-
-CreateBuildDirectory /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/products
-    cd /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/PullOverPlus.xcodeproj
-    builtin-create-build-directory /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/products
 
 CreateBuildDirectory /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/EagerLinkingTBDs/Release-iphoneos
     cd /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/PullOverPlus.xcodeproj
@@ -270,13 +270,13 @@ MkDir /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/
     cd /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main
     /bin/mkdir -p /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/products/PullOverPlusPreferences.bundle
 
-WriteAuxiliaryFile /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/PullOverPlus.build/Release-iphoneos/PullOverPlusPreferences.build/all-product-headers.yaml (in target 'PullOverPlusPreferences' from project 'PullOverPlus')
-    cd /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main
-    write-file /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/PullOverPlus.build/Release-iphoneos/PullOverPlusPreferences.build/all-product-headers.yaml
-
 WriteAuxiliaryFile /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/PullOverPlus.build/Release-iphoneos/PullOverPlusPreferences.build/PullOverPlusPreferences.hmap (in target 'PullOverPlusPreferences' from project 'PullOverPlus')
     cd /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main
     write-file /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/PullOverPlus.build/Release-iphoneos/PullOverPlusPreferences.build/PullOverPlusPreferences.hmap
+
+WriteAuxiliaryFile /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/PullOverPlus.build/Release-iphoneos/PullOverPlusPreferences.build/all-product-headers.yaml (in target 'PullOverPlusPreferences' from project 'PullOverPlus')
+    cd /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main
+    write-file /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/PullOverPlus.build/Release-iphoneos/PullOverPlusPreferences.build/all-product-headers.yaml
 
 WriteAuxiliaryFile /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/PullOverPlus.build/Release-iphoneos/PullOverPlusPreferences.build/PullOverPlusPreferences-project-headers.hmap (in target 'PullOverPlusPreferences' from project 'PullOverPlus')
     cd /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main
@@ -326,13 +326,13 @@ WriteAuxiliaryFile /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plu
     cd /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main
     write-file /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/PullOverPlus.build/Release-iphoneos/PullOverPlus.build/PullOverPlus-all-non-framework-target-headers.hmap
 
-WriteAuxiliaryFile /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/PullOverPlus.build/Release-iphoneos/PullOverPlusPreferences.build/Objects-normal/arm64e/PullOverPlusPreferences.LinkFileList (in target 'PullOverPlusPreferences' from project 'PullOverPlus')
-    cd /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main
-    write-file /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/PullOverPlus.build/Release-iphoneos/PullOverPlusPreferences.build/Objects-normal/arm64e/PullOverPlusPreferences.LinkFileList
-
 WriteAuxiliaryFile /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/PullOverPlus.build/Release-iphoneos/PullOverPlusPreferences.build/Objects-normal/arm64/PullOverPlusPreferences.LinkFileList (in target 'PullOverPlusPreferences' from project 'PullOverPlus')
     cd /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main
     write-file /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/PullOverPlus.build/Release-iphoneos/PullOverPlusPreferences.build/Objects-normal/arm64/PullOverPlusPreferences.LinkFileList
+
+WriteAuxiliaryFile /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/PullOverPlus.build/Release-iphoneos/PullOverPlusPreferences.build/Objects-normal/arm64e/PullOverPlusPreferences.LinkFileList (in target 'PullOverPlusPreferences' from project 'PullOverPlus')
+    cd /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main
+    write-file /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/PullOverPlus.build/Release-iphoneos/PullOverPlusPreferences.build/Objects-normal/arm64e/PullOverPlusPreferences.LinkFileList
 
 WriteAuxiliaryFile /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main/build/roothide/derived-data/Build/Intermediates.noindex/PullOverPlus.build/Release-iphoneos/PullOverPlusPreferences.build/Objects-normal/arm64e/e6072d4f65d7061329687fe24e3d63a7-common-args.resp (in target 'PullOverPlusPreferences' from project 'PullOverPlus')
     cd /Users/runner/work/PullOverPlus/PullOverPlus/src/PullOver-Plus-main
@@ -490,23 +490,9 @@ build.sh 退出码=65
 ++ ls -1 'packages/*.deb'
 ++ head -1
 + DEB=
++ echo '生成的包: '
+生成的包: 
++ '[' -n '' ']'
 + cp -v '' /Users/runner/work/PullOverPlus/PullOverPlus/
 cp: : No such file or directory
 + true
-+ echo '== 上传到临时网盘 =='
-== 上传到临时网盘 ==
-++ curl -s -F file=@ https://0x0.st
-++ true
-+ URL=
-+ echo '下载链接: '
-下载链接: 
-+ ls -la /Users/runner/work/PullOverPlus/PullOverPlus
-total 1848
-drwxr-xr-x   8 runner  staff     256 Sep 18 20:53 .
-drwxr-xr-x   3 runner  staff      96 Sep 18 20:53 ..
-drwxr-xr-x  14 runner  staff     448 Sep 18 20:53 .git
-drwxr-xr-x   3 runner  staff      96 Sep 18 20:53 .github
--rw-r--r--   1 runner  staff  118201 Sep 18 20:53 build.log
--rw-r--r--   1 runner  staff  498702 Sep 18 20:53 deb-latest.deb
-drwxr-xr-x   3 runner  staff      96 Sep 18 20:53 src
--rw-r--r--   1 runner  staff  303550 Sep 18 20:53 src-latest.zip
