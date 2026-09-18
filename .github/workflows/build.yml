@@ -15,9 +15,6 @@ jobs:
           git clone -q --recursive --depth 1 https://github.com/theos/theos.git "$HOME/theos" || echo "克隆 theos 失败"
           brew install -q dpkg ldid || echo "brew 失败（可忽略）"
           sudo ln -sfn "$HOME/theos" /opt/theos
-          ls -la /opt/theos | head -20
-          ls -la /opt/theos/vendor/lib | head -20
-          which dpkg-deb codesign xcodebuild
           cd src/* && chmod +x build.sh
           ./build.sh roothide release || echo "build.sh 退出码=$?"
           find . -name '*.deb' -print
@@ -26,10 +23,13 @@ jobs:
       - name: 把结果放进仓库
         run: |
           cd "$GITHUB_WORKSPACE"
+          rm -f deb-latest.deb
+          DEB=$(ls -1 com.huayuarc*.deb 2>/dev/null | head -1)
+          echo "找到的 deb: [$DEB]"
+          [ -n "$DEB" ] && cp "$DEB" deb-latest.deb
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          DEB=$(ls -1 *.deb 2>/dev/null | head -1)
-          if [ -n "$DEB" ]; then cp "$DEB" deb-latest.deb; git add -f deb-latest.deb; fi
-          if [ -f build.log ]; then git add -f build.log; fi
-          git commit -m "build result" || true
-          git push origin HEAD:main
+          [ -f deb-latest.deb ] && git add -f deb-latest.deb || true
+          [ -f build.log ] && git add -f build.log || true
+          git commit -m "build $(date -u +%H%M)" || echo "无变化"
+          git push origin HEAD:main || echo "推送失败"
