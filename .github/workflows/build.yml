@@ -1,40 +1,154 @@
+# PullOver Plus · GitHub 构建流水线（与 CPU 智能温控 同款）
+# 环境 = Xcode（主工程）+ RootHide 官方 Theos（铺到 /opt/theos 供工程引用）
+# 产出双结构（均可直接上源）：
+#   ① rootless（arm64）—— 直编
+#   ② roothide（arm64e）—— 由①经 RootHidePatcher 官方脚本自动转换（AutoPatches 模式）
+#   ③ 自动换壳（zstd → gzip，兼容 Irisin）
 name: build
-on: [push, workflow_dispatch]
-permissions:
-  contents: write
+
+on:
+  push:
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: macos-14
+
     steps:
       - uses: actions/checkout@v4
-      - name: 编译
+
+      - name: 取源码（仓库里的 src-latest.zip）
         run: |
-          set -x
-          unzip -q src-latest.zip -d src
-          git clone -q --recursive --depth 1 https://github.com/theos/theos.git "$HOME/theos" || echo "克隆 theos 失败"
-          brew install -q dpkg ldid || echo "brew 失败（可忽略）"
-          sudo ln -sfn "$HOME/theos" /opt/theos
-          cd src/* && chmod +x build.sh
-          ./build.sh roothide release || echo "build.sh 退出码=$?"
-          cp -v packages/*.deb "$GITHUB_WORKSPACE"/ || true
-          ls -la "$GITHUB_WORKSPACE"
-      - name: 保存产物到仓库
+          rm -rf src
+          ZIP=$(ls src-latest.zip 2>/dev/null | head -1)
+          [ -z "$ZIP" ] && ZIP=$(ls src-*.zip 2>/dev/null | head -1)
+          [ -z "$ZIP" ] && ZIP=$(ls src*.zip 2>/dev/null | head -1)
+          [ -z "$ZIP" ] && { echo "没找到源码 zip（需要 src-latest.zip）"; exit 1; }
+          echo "使用源码包: $ZIP"
+          unzip -q "$ZIP" -d src
+          PROJ="$(dirname "$(find src -maxdepth 3 -name build.sh | head -1)")"
+          [ -d "$PROJ" ] || { echo "没找到 build.sh"; exit 1; }
+          echo "PROJ=$GITHUB_WORKSPACE/$PROJ" >> $GITHUB_ENV
+          FP=$(cat "$PROJ/PullOverPlus/Package/DEBIAN/control" "$PROJ/build.sh" | shasum | cut -c1-6)
+          echo "SOURCE_FP=$FP" >> "$GITHUB_ENV"
+          echo "源码指纹 SOURCE_FP=$FP"
+          grep -i '^Version' "$PROJ/PullOverPlus/Package/DEBIAN/control"
+          ls -la "$PROJ" | head -30
+
+      - name: 安装环境（RootHide Theos 铺到 /opt/theos + rootless 桩库 + 转换工具链）
         run: |
-          cd "$GITHUB_WORKSPACE"
-          DEB=$(ls -1 com.huayuarc*.deb 2>/dev/null | head -1)
-          if [ -z "$DEB" ]; then echo "::error::没有生成 deb"; exit 1; fi
-          VER=$(echo "$DEB" | sed -E 's/.*_([0-9.]+)_iphoneos.*/\1/')
-          cp "$DEB" "deb-${VER}.deb"
-          cp "$DEB" deb-latest.deb
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add -f "deb-${VER}.deb" deb-latest.deb
-          git commit -m "deb ${VER}" || echo "无变化"
-          git push origin HEAD:main
-      - name: 下载箭头
+          set -e
+          brew install dpkg ldid xz gnu-sed findutils coreutils
+          rm -rf "$HOME/theos"
+          git clone --recursive --quiet https://github.com/roothide/theos.git "$HOME/theos"
+          # 本工程 xcconfig 固定 THEOS=/opt/theos → 软链过去
+          sudo rm -rf /opt/theos
+          sudo ln -s "$HOME/theos" /opt/theos
+          # rootless 链接桩：安装名与线上 1.0.566 完全一致（@rpath/…），确保手机上加载行为不变
+          sudo mkdir -p /opt/theos/vendor/lib/iphone/rootless
+          sed "s|install-name:.*|install-name: '@rpath/libroot.dylib'|" \
+            "$HOME/theos/lib/iphone/rootless/libroot_oldabi.tbd" | sudo tee /opt/theos/vendor/lib/iphone/rootless/libroot.tbd > /dev/null
+          sed "s|install-name:.*|install-name: '@rpath/CydiaSubstrate.framework/CydiaSubstrate'|" \
+            "$HOME/theos/lib/iphone/libsubstrate.tbd" | sudo tee /opt/theos/vendor/lib/libsubstrate.tbd > /dev/null
+          sudo cp /opt/theos/vendor/lib/libsubstrate.tbd /opt/theos/vendor/lib/iphone/rootless/libsubstrate.tbd
+          sudo cp /opt/theos/vendor/lib/iphone/rootless/libroot.tbd /opt/theos/vendor/lib/libroot.tbd
+          echo "== 桩库自检 =="
+          head -4 /opt/theos/vendor/lib/iphone/rootless/libroot.tbd || true
+          head -4 /opt/theos/vendor/lib/libsubstrate.tbd || true
+          echo "== Xcode 自检 =="
+          xcodebuild -version
+
+      - name: 编译 ① rootless（arm64）
+        run: |
+          set -o pipefail
+          cd "$PROJ"
+          chmod +x build.sh
+          rm -f /tmp/build.log
+          if ./build.sh rootless release 2>&1 | tee /tmp/build.log; then
+            echo "ROOTLESS_OK" | tee -a /tmp/build.log
+          else
+            echo "ROOTLESS_FAILED" | tee -a /tmp/build.log
+            tail -120 /tmp/build.log
+            exit 1
+          fi
+          mkdir -p /tmp/pk && cp packages/*.deb /tmp/pk/ 2>/dev/null || true
+          ls -la /tmp/pk
+
+      - name: 编译 ② 自动转换 roothide（arm64e）—— RootHidePatcher 官方脚本
+        run: |
+          set -e
+          export PATH="$(brew --prefix coreutils)/libexec/gnubin:$(brew --prefix gnu-sed)/libexec/gnubin:$(brew --prefix findutils)/libexec/gnubin:$PATH"
+          mkdir -p "$HOME/patcher"
+          curl -fsSL "https://raw.githubusercontent.com/roothide/RootHidePatcher/master/patch.sh" -o "$HOME/patcher/patch.sh"
+          curl -fsSL "https://raw.githubusercontent.com/roothide/RootHidePatcher/master/roothide.entitlements" -o "$HOME/patcher/roothide.entitlements"
+          [ -s "$HOME/patcher/patch.sh" ] || { echo "patch.sh 拉取失败"; exit 1; }
+          # ★ CI 适配：brew 版 ldid 同为 ProcursusTeam 维护，但运行时输出不含 "procursus" 字样，
+          #   官方脚本的"发行版字符串检查"在 CI 上被误伤 → 放宽该检查（签名流程照常，功能不受影响）
+          "$(brew --prefix gnu-sed)/libexec/gnubin/sed" -i 's/grep -q procursus/grep -q ldid/' "$HOME/patcher/patch.sh"
+          grep -n "grep -q ldid" "$HOME/patcher/patch.sh" | tee -a /tmp/build.log || { echo "patch.sh 检查放宽失败"; exit 1; }
+          chmod +x "$HOME/patcher/patch.sh"
+          { echo "--- patcher 工具链自检 ---"
+            ldid 2>&1 | head -3 || true
+            gsed --version | head -1 || true
+            gfind --version | head -1 || true
+            realpath --version | head -1 || true
+            dpkg-deb --version | head -1 || true
+          } | tee -a /tmp/build.log
+          IN=$(ls /tmp/pk/*_iphoneos-arm64.deb | head -1)
+          OUT="${IN%_iphoneos-arm64.deb}_iphoneos-arm64e.deb"
+          echo "PATCHER IN = $IN" | tee -a /tmp/build.log
+          echo "PATCHER OUT = $OUT" | tee -a /tmp/build.log
+          if sudo env "PATH=$PATH" bash "$HOME/patcher/patch.sh" "$IN" "$OUT" AutoPatches >> /tmp/build.log 2>&1; then
+            echo "PATCHER_OK" | tee -a /tmp/build.log
+          else
+            echo "PATCHER_FAILED" | tee -a /tmp/build.log
+            tail -100 /tmp/build.log
+            exit 1
+          fi
+          [ -f "$OUT" ] || { echo "转换产物不存在: $OUT"; exit 1; }
+          ls -la /tmp/pk
+
+      - name: 编译 ③ 换壳（zstd → gzip，兼容 Irisin；tar 流一字不改）
+        run: |
+          set -e
+          IN=$(ls /tmp/pk/*_iphoneos-arm64e.deb | head -1)
+          echo "换壳目标: $IN" | tee -a /tmp/build.log
+          echo 'aW1wb3J0IHN5cywgZ3ppcCwgaGFzaGxpYiwgc3VicHJvY2VzcwpzcmMgPSBzeXMuYXJndlsxXQpkYXRhID0gb3BlbihzcmMsICdyYicpLnJlYWQoKQphc3NlcnQgZGF0YVs6OF0gPT0gYichPGFyY2g+XG4nLCAibm90IGFuIGFyIGFyY2hpdmUiCm1lbWJlcnMgPSB7fQpvcmRlciA9IFtdCm9mZiA9IDgKd2hpbGUgb2ZmIDwgbGVuKGRhdGEpOgogICAgaGRyID0gZGF0YVtvZmY6b2ZmKzYwXQogICAgbmFtZSA9IGhkclswOjE2XS5kZWNvZGUoKS5zdHJpcCgpCiAgICBtdGltZSA9IGludCgoaGRyWzE2OjI4XS5kZWNvZGUoKS5zdHJpcCgpIG9yICcwJykpCiAgICB1aWQgPSBoZHJbMjg6MzRdLmRlY29kZSgpLnN0cmlwKCkgb3IgJzAnCiAgICBnaWQgPSBoZHJbMzQ6NDBdLmRlY29kZSgpLnN0cmlwKCkgb3IgJzAnCiAgICBtb2RlID0gaGRyWzQwOjQ4XS5kZWNvZGUoKS5zdHJpcCgpIG9yICcxMDA2NDQnCiAgICBzaXplID0gaW50KGhkcls0ODo1OF0uZGVjb2RlKCkuc3RyaXAoKSkKICAgIGNvbnRlbnQgPSBkYXRhW29mZis2MDpvZmYrNjArc2l6ZV0KICAgIG1lbWJlcnNbbmFtZV0gPSAobXRpbWUsIHVpZCwgZ2lkLCBtb2RlLCBjb250ZW50KQogICAgb3JkZXIuYXBwZW5kKG5hbWUpCiAgICBvZmYgKz0gNjAgKyBzaXplICsgKHNpemUgJSAyKQpjdHJsID0gc3VicHJvY2Vzcy5ydW4oWydkcGtnLWRlYicsICctLWN0cmwtdGFyZmlsZScsIHNyY10sIGNhcHR1cmVfb3V0cHV0PVRydWUsIGNoZWNrPVRydWUpLnN0ZG91dApmc3lzID0gc3VicHJvY2Vzcy5ydW4oWydkcGtnLWRlYicsICctLWZzeXMtdGFyZmlsZScsIHNyY10sIGNhcHR1cmVfb3V0cHV0PVRydWUsIGNoZWNrPVRydWUpLnN0ZG91dApjZ3ogPSBnemlwLmNvbXByZXNzKGN0cmwsIGNvbXByZXNzbGV2ZWw9OSwgbXRpbWU9MCkKZmd6ID0gZ3ppcC5jb21wcmVzcyhmc3lzLCBjb21wcmVzc2xldmVsPTksIG10aW1lPTApCnJlZiA9IG1lbWJlcnMuZ2V0KCdkZWJpYW4tYmluYXJ5JywgKDAsICcwJywgJzAnLCAnMTAwNjQ0JywgYicyLjBcbicpKQpkZWYgbWsobm0sIGNvbnRlbnQsIHIpOgogICAgbXRpbWUsIHVpZCwgZ2lkLCBtb2RlLCBfID0gcgogICAgbiA9IChubSArICcvJylbOjE2XS5sanVzdCgxNikKICAgIGggPSAoIiVzJS0xMmQlLTZzJS02cyUtOHMlLTEwZGBcbiIgJSAobiwgbXRpbWUsIHVpZCwgZ2lkLCBtb2RlLCBsZW4oY29udGVudCkpKS5lbmNvZGUoKQogICAgcGFkID0gYidcbicgaWYgbGVuKGNvbnRlbnQpICUgMiBlbHNlIGInJwogICAgcmV0dXJuIGggKyBjb250ZW50ICsgcGFkCmRiID0gcmVmWzRdIGlmIHJlZls0XSBlbHNlIGInMi4wXG4nCm91dCA9IGInITxhcmNoPlxuJyArIG1rKCdkZWJpYW4tYmluYXJ5JywgZGIsIHJlZikgKyBtaygnY29udHJvbC50YXIuZ3onLCBjZ3osIHJlZikgKyBtaygnZGF0YS50YXIuZ3onLCBmZ3osIHJlZikKb3BlbihzcmMsICd3YicpLndyaXRlKG91dCkKcHJpbnQoIkdaSVBfU1dBUF9PSyBzaXplPSVkIG1kNT0lcyIgJSAobGVuKG91dCksIGhhc2hsaWIubWQ1KG91dCkuaGV4ZGlnZXN0KCkpKQo=' | base64 -d > /tmp/ci_swap.py
+          python3 /tmp/ci_swap.py "$IN" | tee -a /tmp/build.log
+          dpkg-deb -f "$IN" > /dev/null && echo "SWAP_VERIFY: dpkg-deb 读取 OK" | tee -a /tmp/build.log
+          ls -la /tmp/pk
+
+      - name: 核对（两包数量 · 架构 · 转换标志件 · 换壳）
         if: always()
-        uses: actions/upload-artifact@v4
+        run: |
+          echo "包数量: $(ls /tmp/pk/*.deb 2>/dev/null | wc -l)（应为 2）"
+          for deb in /tmp/pk/*.deb; do
+            [ -f "$deb" ] || continue
+            echo "===== $deb ====="
+            dpkg-deb -f "$deb" Package Name Version Architecture || true
+            dpkg-deb -c "$deb" | grep -E 'DynamicLibraries/PullOverPlus|PreferenceBundles/PullOverPlusPreferences|pkgmirror|roothidepatch' | head -25 || true
+          done
+          echo "===== arm64e 壳检查（应为 gzip：control.tar.gz / data.tar.gz）====="
+          A64E=$(ls /tmp/pk/*_iphoneos-arm64e.deb 2>/dev/null | head -1)
+          if [ -n "$A64E" ]; then ar t "$A64E"; fi
+
+      - name: 日志发公网（方便远程诊断）
+        id: diag
+        if: always()
+        run: |
+          U="$(curl -s --max-time 60 --data-binary @/tmp/build.log https://paste.rs 2>/dev/null || true)"
+          case "$U" in
+            https://*) echo "paste: $U" ;;
+            *) echo "paste 服务暂时不可用——日志请从本页 artifact 下载 build.log"; U="unavailable" ;;
+          esac
+          ID="$(printf '%s' "$U" | tr -d '\r' | grep -oE '[A-Za-z0-9]+$' | head -1)"
+          if [ -z "$ID" ]; then ID="none"; fi
+          echo "tag=PullOverPlus-${SOURCE_FP}-log-$ID" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: PullOverPlus-deb
-          path: "${{ github.workspace }}/com.huayuarc*.deb"
-          if-no-files-found: error
+          name: ${{ steps.diag.outputs.tag || 'CPUthermal-build' }}
+          path: |
+            /tmp/pk/*.deb
+            /tmp/build.log
